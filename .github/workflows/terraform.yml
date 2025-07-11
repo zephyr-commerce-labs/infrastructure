@@ -1,24 +1,25 @@
-name: Terraform Validate
+name: Terraform Fmt & Validate
 
 on:
   push:
     branches: [main, dev]
   pull_request:
-    branches: [main, dev]
 
 jobs:
-  fmt-validate:
+  tf-check:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      # Terraform kurulumu
-      - uses: hashicorp/setup-terraform@v3
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
 
-      # Biçim kontrolü
-      - name: Terraform fmt
+      - name: Terraform Fmt
         run: terraform fmt -check -recursive
 
-      # Yapı doğrulama
-      - name: Terraform validate
-        run: terraform validate || echo "Modules empty – skipping failure"
+      - name: Terraform Validate
+        run: |
+          terraform init -backend=false
+          terraform validate
